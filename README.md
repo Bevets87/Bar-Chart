@@ -1,4 +1,4 @@
-# Bar-Chart
+# d3-Bar-Chart
 []()
 
 ### User Stories:
