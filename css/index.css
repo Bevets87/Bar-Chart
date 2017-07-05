@@ -8,7 +8,18 @@ svg {
   border-radius: 20px; }
 
 rect {
-  opacity: 1;
-  transition: opacity 200 ease-in; }
+  cursor: pointer; }
   rect:hover {
-    opacity: 0.2; }
+    fill: white; }
+
+@media (max-width: 1000px) {
+  text {
+    font-size: 15px; } }
+
+@media (max-width: 600px) {
+  text {
+    font-size: 10px; } }
+
+@media (max-width: 600px) {
+  text {
+    font-size: 7px; } }

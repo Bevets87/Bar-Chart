@@ -4,11 +4,11 @@
 
   const url = 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json'
 
-  const getDataSet = function (url,cb) {
+  const getDataSet = function (url, cb, dimensions) {
     fetch(url)
     .then(function (response) {
       response.json().then(function (data) {
-        cb(data)
+        cb(data, dimensions)
       })
     })
     .catch(function (error) {
@@ -17,36 +17,40 @@
   }
 
 
-  const visualizeData = function (dataset) {
+  const drawSVG = function (dataset, dimensions) {
    // get dataset
     const data = dataset.data
    // set svg parameters to display bar graph
-    const w = 1000
-    const h = 500
-    const paddingLeft = 100
-    const paddingRight = 50
-    const paddingTop = 50
-    const paddingBottom = 80
-   // make tooltip
+    var w = dimensions.width
+    var h = dimensions.height
+    var paddingLeft = 70
+    var paddingRight = 40
+    var paddingTop = 80
+    var paddingBottom = 80
+
+    // make tooltip
     const div = d3.select('body').append('div')
                   .style('opacity', 0);
    // set months for tooltip
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
    // set svg
+    d3.select('#app').selectAll("*").remove();
     const svg = d3.select('#app')
             .append('svg')
             .attr('width', w)
             .attr('height', h)
             .attr('fill', 'darkred')
+            //make svg responsive
+
     // set domain and range for x-linear-scale
     const minDate = d3.min(data, d => new Date(d[0]))
     const maxDate = d3.max(data, d => new Date(d[0]))
-    const xScale = d3.scaleTime()
+    var xScale = d3.scaleTime()
                    .domain([minDate, maxDate])
                    .range([paddingLeft, w - paddingRight])
    // set domain and range for y-linear-scale
     const maxGDP = d3.max(data, d => (d[1]))
-    const yScale = d3.scaleLinear()
+    var yScale = d3.scaleLinear()
                    .domain([0,maxGDP])
                    .range([(h - paddingBottom), paddingTop])
    // display bar graph
@@ -86,7 +90,7 @@
                   .style('fill', 'white')
                   .text('US Gross Domestic Product')
    // make x-axis and label it
-    const xAxis = d3.axisBottom(xScale)
+    var xAxis = d3.axisBottom(xScale)
                   svg.append('g')
                   .attr('transform','translate(0,' + yScale(0) + ')')
                   .style('font-size', '15px')
@@ -99,7 +103,7 @@
                   .style('font-weight','bold')
                   .text('Years')
   // make y-axis and label it
-    const yAxis = d3.axisLeft(yScale)
+    var yAxis = d3.axisLeft(yScale)
                   svg.append('g')
                   .attr('transform','translate('+ xScale(minDate) +',0)')
                   .style('font-size', '15px')
@@ -112,5 +116,30 @@
                   .style('font-weight','bold')
                   .text('USD in Billions')
  }
-  getDataSet(url,visualizeData)
+  window.addEventListener('orientationchange', function () {
+    if (screen.orientation.angle === 90) {
+      getDataSet(url, drawSVG, {width: 600, height: 400})
+    } else {
+      getDataSet(url, drawSVG, {width: 350, height: 350})
+    }
+  })
+  window.addEventListener('load', function () {
+    if (this.innerWidth < 1000 && this.innerWidth >= 600) {
+      getDataSet(url, drawSVG, {width: 600, height: 400})
+    } else if (this.innerWidth < 600) {
+      getDataSet(url, drawSVG, {width: 350, height: 350})
+    } else {
+      getDataSet(url, drawSVG, {width: 800, height: 500})
+    }
+  })
+  window.addEventListener('resize', function () {
+    if (this.innerWidth < 1000 && this.innerWidth >= 600) {
+      getDataSet(url, drawSVG, {width: 600, height: 400})
+    } else if (this.innerWidth < 600) {
+      getDataSet(url, drawSVG, {width: 350, height: 350})
+    } else {
+      getDataSet(url, drawSVG, {width: 800, height: 500})
+    }
+  })
+
 }(d3))
