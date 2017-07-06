@@ -4,17 +4,21 @@
 
   const url = 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json'
 
-  const getDataSet = function (url, cb, dimensions) {
-    fetch(url)
-    .then(function (response) {
-      response.json().then(function (data) {
-        cb(data, dimensions)
+  const getData = function (url) {
+    return new Promise (function (resolve, reject) {
+      fetch(url)
+      .then(function (response) {
+        response.json().then(function (data) {
+        resolve(data)
+        })
+      })
+      .catch(function (error) {
+        reject(error)
       })
     })
-    .catch(function (error) {
-      console.log(error)
-    })
   }
+
+
 
 
   const drawSVG = function (dataset, dimensions) {
@@ -116,30 +120,32 @@
                   .style('font-weight','bold')
                   .text('USD in Billions')
  }
-  window.addEventListener('orientationchange', function () {
-    if (screen.orientation.angle === 90) {
-      getDataSet(url, drawSVG, {width: 600, height: 400})
+
+  getData(url).then(function (data) {
+    if (window.innerWidth < 1000 && window.innerWidth >= 600) {
+      drawSVG(data, {width: 600, height: 400})
+    } else if (window.innerWidth < 600) {
+      drawSVG(data, {width: 350, height: 350})
     } else {
-      getDataSet(url, drawSVG, {width: 350, height: 350})
+      drawSVG(data, {width: 800, height: 500})
     }
+    window.addEventListener('orientationchange', function () {
+      if (screen.orientation.angle === 90) {
+        drawSVG(data, {width: 600, height: 400})
+      } else {
+        drawSVG(data, {width: 350, height: 350})
+      }
+    })
+    window.addEventListener('resize', function () {
+      if (this.innerWidth < 1000 && this.innerWidth >= 600) {
+         drawSVG(data, {width: 600, height: 400})
+      } else if (this.innerWidth < 600) {
+         drawSVG(data, {width: 350, height: 350})
+      } else {
+         drawSVG(data, {width: 800, height: 500})
+      }
+    })
   })
-  window.addEventListener('load', function () {
-    if (this.innerWidth < 1000 && this.innerWidth >= 600) {
-      getDataSet(url, drawSVG, {width: 600, height: 400})
-    } else if (this.innerWidth < 600) {
-      getDataSet(url, drawSVG, {width: 350, height: 350})
-    } else {
-      getDataSet(url, drawSVG, {width: 800, height: 500})
-    }
-  })
-  window.addEventListener('resize', function () {
-    if (this.innerWidth < 1000 && this.innerWidth >= 600) {
-      getDataSet(url, drawSVG, {width: 600, height: 400})
-    } else if (this.innerWidth < 600) {
-      getDataSet(url, drawSVG, {width: 350, height: 350})
-    } else {
-      getDataSet(url, drawSVG, {width: 800, height: 500})
-    }
-  })
+
 
 }(d3))
